@@ -1,0 +1,8 @@
+{
+  "name": "comparador-stablecoins-buda",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Comparador de precios de stablecoins (USDC/USDT vs COP) — competencia vs Buda. Sin dependencias.",
+  "engines": { "node": ">=18" },
+  "scripts": { "start": "node server.js" }
+}
