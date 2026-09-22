@@ -54,8 +54,14 @@
   .vcard .diff{font-size:12.5px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums;}
   .big.good{color:var(--lose);} .big.bad{color:var(--win);} .big.eq{color:var(--muted);}
 
+  /* ---- Pestañas de moneda ---- */
+  .tabs{display:flex;gap:8px;margin:0 0 18px;}
+  .tab{padding:9px 20px;border:1px solid var(--line);border-radius:999px;background:var(--panel);
+    color:var(--muted);cursor:pointer;font-weight:650;font-size:14px;}
+  .tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
   /* ---- Tablas ---- */
-  .coin{margin-top:26px;}
+  .coin{margin-top:20px;}
   .coin .head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
   .coin h3{font-size:16px;margin:0;font-weight:680;}
   .rank{color:var(--muted);font-size:12.5px;}
@@ -141,7 +147,6 @@ function renderFocus(){
   const buda=budaRow(coin);
   const comp=rows.find(r=>r.venue===SEL.venue && !r.isBuda);
   const opcionesEmp=empresasDisponibles().map(v=>`<option value="${v}" ${v===SEL.venue?'selected':''}>${v}</option>`).join('');
-  const opcionesCoin=['usdc','usdt'].map(c=>`<option value="${c}" ${c===coin?'selected':''}>${c.toUpperCase()}</option>`).join('');
 
   let cuerpo='';
   if(!buda){ cuerpo='<p class="dim">Buda no disponible en este par ahora mismo.</p>'; }
@@ -182,10 +187,9 @@ function renderFocus(){
   }
 
   return `<section class="focus">
-    <h2>Comparador individual — Empresa vs Buda</h2>
-    <p class="sub">Elige una empresa y una moneda para el cara a cara.</p>
+    <h2>Comparador individual — Empresa vs Buda <span class="dim">(${coin.toUpperCase()})</span></h2>
+    <p class="sub">Elige una empresa para el cara a cara. La moneda es la de la pestaña activa.</p>
     <div class="pickers">
-      <label>Moneda <select id="fCoin">${opcionesCoin}</select></label>
       <label>Empresa <select id="fEmp">${opcionesEmp}</select></label>
     </div>
     ${cuerpo}
@@ -258,25 +262,25 @@ function captureFormHTML(){
 }
 
 function renderAll(){
+  const coins=Object.keys(DATA.data);
+  if(!coins.includes(SEL.coin)) SEL.coin=coins[0];
+  const tabs=`<div class="tabs">${coins.map(c=>
+    `<button class="tab ${c===SEL.coin?'active':''}" data-coin="${c}">${c.toUpperCase()} / COP</button>`).join('')}</div>`;
   const focus=renderFocus();
-  const tablas=Object.keys(DATA.data).map(renderCoin).join('');
+  const tabla=renderCoin(SEL.coin);
   const legend=`<div class="legend">
       <span><span class="lose">verde</span> Buda gana · <span class="win">rojo</span> el competidor gana</span>
       <span><span class="badge spot">spot</span> libro ejecutable · <span class="badge p2p">p2p</span> mejor aviso · <span class="badge platform">platform</span> tasa de plataforma</span>
     </div>`;
   const pend=(DATA.sourcesPending&&DATA.sourcesPending.length)
     ? `<p class="pending">Por captura manual: ${DATA.sourcesPending.map(s=>s.label||s.id).join(', ')}.</p>`:'';
-  document.getElementById('out').innerHTML=focus+tablas+legend+pend+captureFormHTML();
+  document.getElementById('out').innerHTML=tabs+focus+tabla+legend+pend+captureFormHTML();
 
-  // listeners del comparador individual
-  const fCoin=document.getElementById('fCoin'), fEmp=document.getElementById('fEmp');
-  if(fCoin) fCoin.addEventListener('change',e=>{ SEL.coin=e.target.value; rerenderFocusOnly(); });
-  if(fEmp)  fEmp.addEventListener('change', e=>{ SEL.venue=e.target.value; rerenderFocusOnly(); });
+  // pestañas de moneda: cambian la tabla Y el comparador individual
+  document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{ SEL.coin=b.dataset.coin; renderAll(); }));
+  const fEmp=document.getElementById('fEmp');
+  if(fEmp) fEmp.addEventListener('change', e=>{ SEL.venue=e.target.value; renderAll(); });
   wireCapture();
-}
-function rerenderFocusOnly(){
-  // Re-renderiza todo (simple y suficiente) manteniendo la selección.
-  renderAll();
 }
 
 async function wireCapture(){
