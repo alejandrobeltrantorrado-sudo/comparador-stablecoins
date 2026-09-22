@@ -121,7 +121,8 @@ async function fetchBybitP2P(coin, fiat) {
 // --- Captura manual (Plenti, Littio, VIIO, Wenia) ---------------------------
 const MANUAL_FILE = path.join(__dirname, 'platform-rates.json');
 const MANUAL_STALE_HOURS = 12;
-const MANUAL_KNOWN = { plenti: 'Plenti', littio: 'Littio', viio: 'VIIO', wenia: 'Wenia' };
+const MANUAL_KNOWN = { plenti: 'Plenti', littio: 'Littio', viio: 'VIIO', wenia: 'Wenia',
+  conduit: 'Conduit', supra: 'Supra', akaunt: 'Akaunt' };
 function manualRead() { try { return JSON.parse(fs.readFileSync(MANUAL_FILE, 'utf8')) || {}; } catch { return {}; } }
 function manualWrite(s) { fs.writeFileSync(MANUAL_FILE, JSON.stringify(s, null, 2)); }
 function manualRecord({ venue, coin, fiat, ask, bid, observer }) {
@@ -249,7 +250,7 @@ const server = http.createServer(async (req, res) => {
       const data = {}; for (const coin of COINS) data[coin] = await gather(coin, volume);
       return sendJSON(res, 200, { fiat: FIAT.toUpperCase(), volume, generatedAt: Date.now(),
         sourcesActive: RETAIL_IDS.map((id) => ({ id })),
-        sourcesPending: [{ id: 'littio', label: 'Littio' }, { id: 'viio', label: 'VIIO' }, { id: 'wenia', label: 'Wenia' }], data });
+        sourcesPending: Object.entries(MANUAL_KNOWN).map(([id, label]) => ({ id, label })), data });
     }
 
     if (p === '/api/cbp-benchmark') {
