@@ -6,12 +6,12 @@
 <title>Comparador de stablecoins · Buda</title>
 <style>
   :root{
-    --bg:#0e1014; --panel:#161922; --panel2:#1b1f2a; --line:#272c38; --txt:#e8eaef; --muted:#8a92a3;
-    --buda:#12251d; --budaline:#2f8f63; --budatext:#57d497;
-    --win:#e2555a;   /* competidor le gana a Buda (rojo) */
-    --lose:#46b17b;  /* Buda gana (verde) */
-    --spot:#26406b; --p2p:#5a4620; --platform:#4a2f52;
-    --accent:#3b7cff; --warn:#d9a417;
+    --bg:#f5f7fa; --panel:#ffffff; --panel2:#eef1f6; --line:#dde2ea; --txt:#1a1e27; --muted:#616b7c;
+    --buda:#e7f7ee; --budaline:#1f9d63; --budatext:#0f7a47;
+    --win:#c62f36;   /* competidor le gana a Buda (rojo) */
+    --lose:#1f9d63;  /* Buda gana (verde) */
+    --spot:#dbe7fb; --p2p:#f4e8cd; --platform:#efdff5;
+    --accent:#2b6cff; --warn:#b8860b;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--bg);color:var(--txt);
@@ -31,8 +31,8 @@
   main{padding:14px 22px 48px;max-width:1200px;}
 
   /* ---- Comparador individual ---- */
-  .focus{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
-    border-radius:16px;padding:18px 18px 20px;margin-bottom:26px;}
+  .focus{background:var(--panel);border:1px solid var(--line);
+    border-radius:16px;padding:18px 18px 20px;margin-bottom:26px;box-shadow:0 1px 3px rgba(20,30,50,.06);}
   .focus h2{font-size:15px;margin:0 0 3px;font-weight:650;}
   .focus .sub{color:var(--muted);font-size:12.5px;margin:0 0 14px;}
   .focus .pickers{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
@@ -60,7 +60,7 @@
   .coin h3{font-size:16px;margin:0;font-weight:680;}
   .rank{color:var(--muted);font-size:12.5px;}
   .rank b{color:var(--txt);}
-  .wrap{overflow-x:auto;border:1px solid var(--line);border-radius:13px;}
+  .wrap{overflow-x:auto;border:1px solid var(--line);border-radius:13px;background:var(--panel);box-shadow:0 1px 3px rgba(20,30,50,.06);}
   table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px;}
   th,td{text-align:right;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;}
   th:first-child,td:first-child,th:nth-child(2),td:nth-child(2),th:nth-child(3),td:nth-child(3),
@@ -70,7 +70,7 @@
   tbody tr:last-child td{border-bottom:0;}
   tr.buda td{background:var(--buda);}
   tr.buda td:first-child{border-left:3px solid var(--budaline);font-weight:700;color:var(--budatext);}
-  .badge{font-size:10.5px;padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em;}
+  .badge{font-size:10.5px;padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em;color:#2a3446;}
   .badge.spot{background:var(--spot);} .badge.p2p{background:var(--p2p);} .badge.platform{background:var(--platform);}
   .src{font-size:11px;color:var(--muted);}
   .win{color:var(--win);} .lose{color:var(--lose);} .dim{color:var(--muted);}
@@ -243,8 +243,8 @@ function renderCoin(coinName){
 function captureFormHTML(){
   return `<div class="capture">
     <h3>Registrar tasa observada (plataformas cerradas)</h3>
-    <p>Plenti, Littio, VIIO y Wenia no exponen API pública. Anota aquí la tasa que ves en su app;
-       se muestra con marca de antigüedad, nunca como dato en vivo.</p>
+    <p>Plenti, Littio, VIIO, Wenia, Conduit, Supra y Akaunt no exponen tasa pública. Anota aquí la
+       que veas en su app o cotización; se muestra con marca de antigüedad, nunca como dato en vivo.</p>
     <form id="capForm">
       <select id="capVenue"></select>
       <select id="capCoin"><option value="usdc">USDC</option><option value="usdt">USDT</option></select>
