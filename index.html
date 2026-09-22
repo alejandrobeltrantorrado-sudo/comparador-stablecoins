@@ -3,60 +3,97 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Comparador multi-fuente de stablecoins vs Buda</title>
+<title>Comparador de stablecoins · Buda</title>
 <style>
-  :root{--bg:#0f1115;--panel:#171a21;--line:#262a33;--txt:#e6e8ec;--muted:#8b93a1;
-    --buda:#1b2c26;--budaline:#2f6b4f;--win:#e2555a;--lose:#46b17b;
-    --spot:#2a3550;--p2p:#4a3a1f;--plat:#3a2a4a;--warn:#c9a227;}
+  :root{
+    --bg:#0e1014; --panel:#161922; --panel2:#1b1f2a; --line:#272c38; --txt:#e8eaef; --muted:#8a92a3;
+    --buda:#12251d; --budaline:#2f8f63; --budatext:#57d497;
+    --win:#e2555a;   /* competidor le gana a Buda (rojo) */
+    --lose:#46b17b;  /* Buda gana (verde) */
+    --spot:#26406b; --p2p:#5a4620; --platform:#4a2f52;
+    --accent:#3b7cff; --warn:#d9a417;
+  }
   *{box-sizing:border-box;}
-  body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
-  header{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;}
-  h1{font-size:17px;margin:0;font-weight:650;}
-  .controls{display:flex;gap:12px;align-items:center;margin-left:auto;flex-wrap:wrap;}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+  a{color:var(--muted);text-decoration:none;}
+  header{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;}
+  header h1{font-size:17px;margin:0;font-weight:680;letter-spacing:-.01em;}
+  header .dot{color:var(--budatext);}
+  .controls{display:flex;gap:10px;align-items:center;margin-left:auto;flex-wrap:wrap;}
   label{color:var(--muted);font-size:13px;}
-  input{width:110px;background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 9px;font:inherit;}
-  button{background:#2b6cff;color:#fff;border:0;border-radius:8px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer;}
+  input,select{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:8px 10px;font:inherit;}
+  input{width:104px;}
+  button{background:var(--accent);color:#fff;border:0;border-radius:9px;padding:9px 15px;font:inherit;font-weight:600;cursor:pointer;}
   button:disabled{opacity:.5;cursor:default;}
-  .meta{color:var(--muted);font-size:12.5px;padding:10px 22px 0;}
+  .meta{color:var(--muted);font-size:12.5px;padding:12px 22px 0;}
   .meta b{color:var(--txt);}
-  main{padding:8px 22px 40px;}
-  .coin{margin-top:22px;}
-  .coin h2{font-size:15px;margin:0 0 4px;}
-  .rank{color:var(--muted);font-size:13px;margin:0 0 10px;}
+  main{padding:14px 22px 48px;max-width:1200px;}
+
+  /* ---- Comparador individual ---- */
+  .focus{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
+    border-radius:16px;padding:18px 18px 20px;margin-bottom:26px;}
+  .focus h2{font-size:15px;margin:0 0 3px;font-weight:650;}
+  .focus .sub{color:var(--muted);font-size:12.5px;margin:0 0 14px;}
+  .focus .pickers{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:560px){ .vs{grid-template-columns:1fr;} }
+  .party{border:1px solid var(--line);border-radius:13px;padding:14px 15px;background:var(--bg);}
+  .party.buda{border-color:var(--budaline);background:var(--buda);}
+  .party .name{font-weight:680;font-size:15px;margin-bottom:2px;}
+  .party.buda .name{color:var(--budatext);}
+  .party .tag{font-size:11px;color:var(--muted);}
+  .party .nums{display:flex;gap:22px;margin-top:12px;}
+  .party .num .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .party .num .v{font-size:21px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:2px;}
+  .verdicts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+  @media (max-width:560px){ .verdicts{grid-template-columns:1fr;} }
+  .vcard{border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:var(--bg);}
+  .vcard .lbl{font-size:12px;color:var(--muted);margin-bottom:6px;}
+  .vcard .big{font-size:17px;font-weight:700;}
+  .vcard .diff{font-size:12.5px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums;}
+  .big.good{color:var(--lose);} .big.bad{color:var(--win);} .big.eq{color:var(--muted);}
+
+  /* ---- Tablas ---- */
+  .coin{margin-top:26px;}
+  .coin .head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
+  .coin h3{font-size:16px;margin:0;font-weight:680;}
+  .rank{color:var(--muted);font-size:12.5px;}
   .rank b{color:var(--txt);}
-  .wrap{overflow-x:auto;}
-  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;}
-  th,td{text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;}
-  th:first-child,td:first-child,th:nth-child(2),td:nth-child(2),th:nth-child(3),td:nth-child(3){text-align:left;}
-  th{color:var(--muted);font-weight:600;font-size:12.5px;position:sticky;top:0;background:var(--bg);}
+  .wrap{overflow-x:auto;border:1px solid var(--line);border-radius:13px;}
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px;}
+  th,td{text-align:right;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child,th:nth-child(2),td:nth-child(2),th:nth-child(3),td:nth-child(3),
+  th:last-child,td:last-child{text-align:left;}
+  th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em;
+    background:var(--panel);position:sticky;top:0;}
+  tbody tr:last-child td{border-bottom:0;}
   tr.buda td{background:var(--buda);}
-  tr.buda td:first-child{border-left:3px solid var(--budaline);font-weight:700;}
-  .badge{font-size:11px;padding:2px 7px;border-radius:999px;}
-  .badge.spot{background:var(--spot);}.badge.p2p{background:var(--p2p);}.badge.platform{background:var(--plat);}
+  tr.buda td:first-child{border-left:3px solid var(--budaline);font-weight:700;color:var(--budatext);}
+  .badge{font-size:10.5px;padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em;}
+  .badge.spot{background:var(--spot);} .badge.p2p{background:var(--p2p);} .badge.platform{background:var(--platform);}
   .src{font-size:11px;color:var(--muted);}
-  .win{color:var(--win);}.lose{color:var(--lose);}.dim{color:var(--muted);}
-  .disc{color:var(--warn);font-size:11px;}
-  .stale{color:var(--warn);font-size:11px;}
-  .fresh{color:var(--lose);font-size:11px;}
-  .legend{color:var(--muted);font-size:12.5px;margin:14px 0 0;display:flex;gap:18px;flex-wrap:wrap;}
+  .win{color:var(--win);} .lose{color:var(--lose);} .dim{color:var(--muted);}
+  .disc{color:var(--warn);font-size:11px;} .stale{color:var(--warn);font-size:11px;} .fresh{color:var(--lose);font-size:11px;}
+  .legend{color:var(--muted);font-size:12px;margin:16px 0 0;display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
+  .pending{color:var(--muted);font-size:12px;margin-top:12px;}
   .err{color:var(--win);}
-  .pending{color:var(--muted);font-size:12px;margin-top:10px;}
-  .capture{margin:22px 0 0;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--panel);}
+
+  /* ---- Captura manual ---- */
+  .capture{margin:26px 0 0;padding:16px 18px;border:1px dashed var(--line);border-radius:13px;background:var(--panel);}
   .capture h3{margin:0 0 4px;font-size:14px;}
-  .capture p{margin:0 0 10px;color:var(--muted);font-size:12.5px;}
+  .capture p{margin:0 0 12px;color:var(--muted);font-size:12.5px;}
   .capture form{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
-  .capture select,.capture input{background:var(--bg);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 9px;font:inherit;}
-  .capture input.num{width:120px;}
   .capture .msg{font-size:12.5px;margin-left:6px;}
 </style>
 </head>
 <body>
 <header>
-  <h1>Stablecoins en COP — multi-fuente vs Buda</h1>
+  <h1><span class="dot">●</span> Comparador de stablecoins <span class="dim" style="font-weight:400">· vs Buda</span></h1>
   <div class="controls">
     <label>Volumen <input id="vol" type="number" min="1" step="1" value="1000" /></label>
     <button id="go">Actualizar</button>
-    <a href="/cbp.html" style="color:#8b93a1;font-size:13px;text-decoration:none;">Benchmark B2B →</a>
+    <a href="/cbp.html">Benchmark B2B →</a>
   </div>
 </header>
 <div class="meta" id="meta">Cargando…</div>
@@ -64,26 +101,112 @@
 
 <script>
 const fmt=new Intl.NumberFormat('es-CO',{maximumFractionDigits:2});
-const pct=(n)=>(n>0?'+':'')+n.toFixed(3)+'%';
+const pct=(n)=>(n>0?'+':'')+n.toFixed(2)+'%';
 const cop=(n)=>n==null?'—':'$'+fmt.format(n);
+let DATA=null, SEL={coin:'usdc', venue:null};
 
+// ---------- helpers de veredicto ----------
+function ladoVeredicto(delta,budaMejorSiPositivo){
+  if(delta==null) return {cls:'eq',txt:'sin dato'};
+  if(delta===0) return {cls:'eq',txt:'igual'};
+  const budaMejor = budaMejorSiPositivo ? delta>0 : delta<0;
+  return budaMejor ? {cls:'good',txt:'Buda mejor'} : {cls:'bad',txt:'Buda peor'};
+}
 function deltaCell(dCop,dPct,winWhenPositive){
   if(dCop==null)return '<td class="dim">—</td>';
   const wins=winWhenPositive?dCop>0:dCop<0;
-  const cls=dCop===0?'dim':(wins?'win':'lose');
-  const sign=dCop>0?'+':'';
+  const cls=dCop===0?'dim':(wins?'win':'lose'); const sign=dCop>0?'+':'';
   return `<td class="${cls}">${sign}${fmt.format(dCop)} <span class="dim">(${pct(dPct)})</span></td>`;
 }
+function verdictCell(x){
+  if(x.venue==='buda') return '<td class="dim">referencia</td>';
+  const c=ladoVeredicto(x.buyDeltaCop,true), v=ladoVeredicto(x.sellDeltaCop,false);
+  const span=(o)=>`<span class="${o.cls==='good'?'lose':o.cls==='bad'?'win':'dim'}">${o.txt}</span>`;
+  return `<td style="font-size:12.5px;line-height:1.6;">Compra: ${span(c)}<br>Venta: ${span(v)}</td>`;
+}
+function budaRow(coin){ return (DATA.data[coin].rows||[]).find(r=>r.isBuda&&r.source==='buda-direct')
+  || (DATA.data[coin].rows||[]).find(r=>r.isBuda) || null; }
 
-function renderCoin(coinName,block){
-  const rows=[...block.rows].sort((a,b)=>{
-    if(a.totalAsk==null)return 1; if(b.totalAsk==null)return -1; return a.totalAsk-b.totalAsk;
-  });
-  const bud=rows.filter(r=>r.totalAsk!=null).sort((a,b)=>a.totalAsk-b.totalAsk);
-  const sel=rows.filter(r=>r.totalBid!=null).sort((a,b)=>b.totalBid-a.totalBid);
-  const bBuy=bud.findIndex(r=>r.isBuda&&r.source==='buda-direct'); const bSell=sel.findIndex(r=>r.isBuda&&r.source==='buda-direct');
+// ---------- comparador individual ----------
+function empresasDisponibles(){
+  const set=new Map();
+  for(const coin of Object.keys(DATA.data)){
+    for(const r of DATA.data[coin].rows||[]){ if(!r.isBuda) set.set(r.venue, r.venue); }
+  }
+  return [...set.keys()].sort();
+}
+function renderFocus(){
+  const coin=SEL.coin;
+  const rows=DATA.data[coin] ? DATA.data[coin].rows||[] : [];
+  const buda=budaRow(coin);
+  const comp=rows.find(r=>r.venue===SEL.venue && !r.isBuda);
+  const opcionesEmp=empresasDisponibles().map(v=>`<option value="${v}" ${v===SEL.venue?'selected':''}>${v}</option>`).join('');
+  const opcionesCoin=['usdc','usdt'].map(c=>`<option value="${c}" ${c===coin?'selected':''}>${c.toUpperCase()}</option>`).join('');
+
+  let cuerpo='';
+  if(!buda){ cuerpo='<p class="dim">Buda no disponible en este par ahora mismo.</p>'; }
+  else if(!comp){ cuerpo='<p class="dim">Elige una empresa para comparar.</p>'; }
+  else {
+    const c=ladoVeredicto(comp.buyDeltaCop,true), v=ladoVeredicto(comp.sellDeltaCop,false);
+    const dc=comp.buyDeltaCop, dv=comp.sellDeltaCop;
+    cuerpo=`
+    <div class="vs">
+      <div class="party buda">
+        <div class="name">Buda</div><div class="tag">tu casa · ${buda.type}</div>
+        <div class="nums">
+          <div class="num"><div class="k">Compra</div><div class="v">${cop(buda.totalAsk)}</div></div>
+          <div class="num"><div class="k">Venta</div><div class="v">${cop(buda.totalBid)}</div></div>
+        </div>
+      </div>
+      <div class="party">
+        <div class="name">${comp.venue}</div><div class="tag">${comp.type} · ${comp.source}</div>
+        <div class="nums">
+          <div class="num"><div class="k">Compra</div><div class="v">${cop(comp.totalAsk)}</div></div>
+          <div class="num"><div class="k">Venta</div><div class="v">${cop(comp.totalBid)}</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="verdicts">
+      <div class="vcard">
+        <div class="lbl">Al COMPRAR ${coin.toUpperCase()}</div>
+        <div class="big ${c.cls}">${c.txt}</div>
+        <div class="diff">${dc==null?'—':`diferencia ${dc>0?'+':''}${fmt.format(dc)} COP (${pct(comp.buyDeltaPct)})`}</div>
+      </div>
+      <div class="vcard">
+        <div class="lbl">Al VENDER ${coin.toUpperCase()}</div>
+        <div class="big ${v.cls}">${v.txt}</div>
+        <div class="diff">${dv==null?'—':`diferencia ${dv>0?'+':''}${fmt.format(dv)} COP (${pct(comp.sellDeltaPct)})`}</div>
+      </div>
+    </div>
+    ${comp.type!=='spot'?`<p class="pending">Nota: ${comp.venue} es de tipo <b>${comp.type}</b>; su precio no es un libro de órdenes como el de Buda, así que la comparación es indicativa.</p>`:''}`;
+  }
+
+  return `<section class="focus">
+    <h2>Comparador individual — Empresa vs Buda</h2>
+    <p class="sub">Elige una empresa y una moneda para el cara a cara.</p>
+    <div class="pickers">
+      <label>Moneda <select id="fCoin">${opcionesCoin}</select></label>
+      <label>Empresa <select id="fEmp">${opcionesEmp}</select></label>
+    </div>
+    ${cuerpo}
+  </section>`;
+}
+
+// ---------- tablas ----------
+function renderCoin(coinName){
+  const block=DATA.data[coinName];
+  const all=[...(block.rows||[])];
+  // Buda SIEMPRE primero; el resto ordenado por precio de compra.
+  const buda=all.filter(r=>r.isBuda);
+  const resto=all.filter(r=>!r.isBuda).sort((a,b)=>{
+    if(a.totalAsk==null)return 1; if(b.totalAsk==null)return -1; return a.totalAsk-b.totalAsk; });
+  const rows=[...buda,...resto];
+
+  const bud=all.filter(r=>r.totalAsk!=null).sort((a,b)=>a.totalAsk-b.totalAsk);
+  const sel=all.filter(r=>r.totalBid!=null).sort((a,b)=>b.totalBid-a.totalBid);
+  const bBuy=bud.findIndex(r=>r.isBuda&&r.source==='buda-direct'), bSell=sel.findIndex(r=>r.isBuda&&r.source==='buda-direct');
   const rankLine=(bBuy>=0||bSell>=0)
-    ? `Buda: <b>#${bBuy+1}</b>/${bud.length} más barato para <b>comprar</b> · <b>#${bSell+1}</b>/${sel.length} mejor para <b>vender</b>`
+    ? `Buda: <b>#${bBuy+1}</b>/${bud.length} más barato para comprar · <b>#${bSell+1}</b>/${sel.length} mejor para vender`
     : 'Buda directo no disponible en este par.';
 
   const body=rows.map(x=>{
@@ -92,7 +215,7 @@ function renderCoin(coinName,block){
     let age='';
     if(x.source==='manual'){
       age=x.ageHours==null?' <span class="stale">sin fecha</span>'
-        :x.stale?` <span class="stale" title="Observado hace ${x.ageHours} h — posiblemente obsoleto">⌛ ${x.ageHours}h</span>`
+        :x.stale?` <span class="stale" title="Observado hace ${x.ageHours} h">⌛ ${x.ageHours}h</span>`
         :` <span class="fresh" title="Observado hace ${x.ageHours} h">✓ ${x.ageHours}h</span>`;
     }
     return `<tr class="${x.isBuda?'buda':''}">
@@ -103,88 +226,94 @@ function renderCoin(coinName,block){
       ${x.venue==='buda'?'<td class="dim">ref</td>':deltaCell(x.buyDeltaCop,x.buyDeltaPct,false)}
       <td>${cop(x.totalBid)}</td>
       ${x.venue==='buda'?'<td class="dim">ref</td>':deltaCell(x.sellDeltaCop,x.sellDeltaPct,true)}
+      ${verdictCell(x)}
     </tr>`;}).join('');
 
   const errs=block.errors&&block.errors.length
     ? `<p class="pending">Fuentes con error: ${block.errors.map(e=>`${e.source} (${e.error})`).join(' · ')}</p>`:'';
 
-  return `<section class="coin"><h2>${coinName.toUpperCase()} / COP</h2>
-    <p class="rank">${rankLine}</p>
+  return `<section class="coin">
+    <div class="head"><h3>${coinName.toUpperCase()} / COP</h3><span class="rank">${rankLine}</span></div>
     <div class="wrap"><table>
       <thead><tr><th>Venue</th><th>Tipo</th><th>Fuente / base</th>
-        <th>Compra</th><th>Δ compra vs Buda</th><th>Venta</th><th>Δ venta vs Buda</th></tr></thead>
+        <th>Compra</th><th>Δ compra</th><th>Venta</th><th>Δ venta</th><th>¿Buda mejor?</th></tr></thead>
       <tbody>${body}</tbody></table></div>${errs}</section>`;
 }
 
-async function load(){
-  const btn=document.getElementById('go'),meta=document.getElementById('meta'),out=document.getElementById('out');
-  const vol=Math.max(1,Number(document.getElementById('vol').value)||1000);
-  btn.disabled=true;meta.textContent='Cargando…';
-  try{
-    const res=await fetch('/api/quotes?volume='+vol);
-    const j=await res.json();
-    if(!res.ok)throw new Error(j.detail||j.error||('HTTP '+res.status));
-    meta.innerHTML=`Volumen <b>${fmt.format(j.volume)}</b> · ${new Date(j.generatedAt).toLocaleTimeString('es-CO')} · `
-      +`fuentes activas: <b>${j.sourcesActive.map(s=>s.id).join(', ')}</b>`;
-    out.innerHTML=Object.entries(j.data).map(([c,b])=>renderCoin(c,b)).join('')
-      +`<div class="legend">
-          <span><span class="win">rojo</span>: el competidor le gana a Buda</span>
-          <span><span class="lose">verde</span>: Buda le gana</span>
-          <span><span class="badge spot">spot</span> ejecutable · <span class="badge p2p">p2p</span> mejor aviso · <span class="badge platform">platform</span> tasa de plataforma</span>
-          <span><span class="disc">⚠</span> discrepancia entre fuentes</span>
-        </div>`
-      +captureFormHTML();
-    wireCapture();
-  }catch(err){out.innerHTML='';meta.innerHTML=`<span class="err">Error: ${err.message}</span>`;}
-  finally{btn.disabled=false;}
-}
-
-// --- Captura manual de plataformas cerradas (Plenti, Littio, VIIO, Wenia) ---
 function captureFormHTML(){
   return `<div class="capture">
     <h3>Registrar tasa observada (plataformas cerradas)</h3>
-    <p>Plenti, Littio, VIIO y Wenia no exponen API pública: su tasa solo se ve dentro de la app.
-       Aquí registras una observación real; se muestra con marca de antigüedad, nunca como feed en vivo.</p>
+    <p>Plenti, Littio, VIIO y Wenia no exponen API pública. Anota aquí la tasa que ves en su app;
+       se muestra con marca de antigüedad, nunca como dato en vivo.</p>
     <form id="capForm">
       <select id="capVenue"></select>
       <select id="capCoin"><option value="usdc">USDC</option><option value="usdt">USDT</option></select>
-      <input class="num" id="capAsk" type="number" step="0.01" placeholder="Compra (COP)" />
-      <input class="num" id="capBid" type="number" step="0.01" placeholder="Venta (COP)" />
-      <input id="capObs" placeholder="Observador (opcional)" />
+      <input id="capAsk" type="number" step="0.01" placeholder="Compra (COP)" />
+      <input id="capBid" type="number" step="0.01" placeholder="Venta (COP)" />
+      <input id="capObs" style="width:150px" placeholder="Observador (opcional)" />
       <button type="submit">Guardar</button>
       <span class="msg dim" id="capMsg"></span>
     </form>
   </div>`;
 }
 
+function renderAll(){
+  const focus=renderFocus();
+  const tablas=Object.keys(DATA.data).map(renderCoin).join('');
+  const legend=`<div class="legend">
+      <span><span class="lose">verde</span> Buda gana · <span class="win">rojo</span> el competidor gana</span>
+      <span><span class="badge spot">spot</span> libro ejecutable · <span class="badge p2p">p2p</span> mejor aviso · <span class="badge platform">platform</span> tasa de plataforma</span>
+    </div>`;
+  const pend=(DATA.sourcesPending&&DATA.sourcesPending.length)
+    ? `<p class="pending">Por captura manual: ${DATA.sourcesPending.map(s=>s.label||s.id).join(', ')}.</p>`:'';
+  document.getElementById('out').innerHTML=focus+tablas+legend+pend+captureFormHTML();
+
+  // listeners del comparador individual
+  const fCoin=document.getElementById('fCoin'), fEmp=document.getElementById('fEmp');
+  if(fCoin) fCoin.addEventListener('change',e=>{ SEL.coin=e.target.value; rerenderFocusOnly(); });
+  if(fEmp)  fEmp.addEventListener('change', e=>{ SEL.venue=e.target.value; rerenderFocusOnly(); });
+  wireCapture();
+}
+function rerenderFocusOnly(){
+  // Re-renderiza todo (simple y suficiente) manteniendo la selección.
+  renderAll();
+}
+
 async function wireCapture(){
-  const sel=document.getElementById('capVenue');
-  if(!sel)return;
-  try{
-    const meta=await (await fetch('/api/platform-rates')).json();
+  const sel=document.getElementById('capVenue'); if(!sel) return;
+  try{ const meta=await (await fetch('/api/platform-rates')).json();
     const known=meta.known||{plenti:'Plenti',littio:'Littio',viio:'VIIO',wenia:'Wenia'};
     sel.innerHTML=Object.entries(known).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
   }catch{ sel.innerHTML=['plenti','littio','viio','wenia'].map(k=>`<option value="${k}">${k}</option>`).join(''); }
   document.getElementById('capForm').addEventListener('submit',async(e)=>{
-    e.preventDefault();
-    const msg=document.getElementById('capMsg');
-    const body={
-      venue:sel.value, coin:document.getElementById('capCoin').value, fiat:'cop',
-      ask:document.getElementById('capAsk').value||null,
-      bid:document.getElementById('capBid').value||null,
-      observer:document.getElementById('capObs').value||null,
-    };
-    msg.textContent='Guardando…';msg.className='msg dim';
-    try{
-      const r=await fetch('/api/platform-rates',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-      const j=await r.json();
-      if(!r.ok||!j.ok)throw new Error(j.error||('HTTP '+r.status));
-      msg.textContent='Guardado. Actualizando…';msg.className='msg fresh';
-      load();
+    e.preventDefault(); const msg=document.getElementById('capMsg');
+    const body={ venue:sel.value, coin:document.getElementById('capCoin').value, fiat:'cop',
+      ask:document.getElementById('capAsk').value||null, bid:document.getElementById('capBid').value||null,
+      observer:document.getElementById('capObs').value||null };
+    msg.textContent='Guardando…'; msg.className='msg dim';
+    try{ const r=await fetch('/api/platform-rates',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const j=await r.json(); if(!r.ok||!j.ok)throw new Error(j.error||('HTTP '+r.status));
+      msg.textContent='Guardado.'; msg.className='msg fresh'; load();
     }catch(err){ msg.textContent='Error: '+err.message; msg.className='msg err'; }
   });
 }
 
+async function load(){
+  const btn=document.getElementById('go'),meta=document.getElementById('meta');
+  const vol=Math.max(1,Number(document.getElementById('vol').value)||1000);
+  btn.disabled=true;meta.textContent='Cargando…';
+  try{
+    const res=await fetch('/api/quotes?volume='+vol);
+    const j=await res.json();
+    if(!res.ok)throw new Error(j.detail||j.error||('HTTP '+res.status));
+    DATA=j;
+    // selección inicial de empresa si no hay
+    if(!SEL.venue){ const e=empresasDisponibles(); SEL.venue=e[0]||null; }
+    meta.innerHTML=`Volumen <b>${fmt.format(j.volume)}</b> · ${new Date(j.generatedAt).toLocaleTimeString('es-CO')} · fuentes: <b>${j.sourcesActive.map(s=>s.id).join(', ')}</b>`;
+    renderAll();
+  }catch(err){ document.getElementById('out').innerHTML=''; meta.innerHTML=`<span class="err">Error: ${err.message}</span>`; }
+  finally{ btn.disabled=false; }
+}
 document.getElementById('go').addEventListener('click',load);
 document.getElementById('vol').addEventListener('keydown',e=>{if(e.key==='Enter')load();});
 load();
